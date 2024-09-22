@@ -23,7 +23,7 @@ namespace Heloid
         public static StreamReader sr;
         static bool foundInit = false;
         static string initLoc;
-        static DataTable table = new DataTable();
+        public static DataTable table = new DataTable();
         static private CommandManager commandManager = new CommandManager();
 
         static void Main(string[] args)
@@ -47,32 +47,42 @@ namespace Heloid
                     workingDrive = drive.Name;
                 }
             }
-            Log("Confirmed that there is only one init.hax file.");
+            Log("Confirmed that there is less than two init.hax files.");
             Log("Imagine the havoc that would be caused if multiple init.hax files were found across multiple drives!");
             if (!foundInit)
             {
-                Crash("Missing init file!", 2);
+                //Crash("Missing init file!", 2);
+                Log("Missing init file!");
             }
-            using (sr = new StreamReader(initLoc))
+            else
             {
-                Log("Running script in init.hax...");
-                script = true;
-                string lineraw;
-                while ((lineraw = sr.ReadLine()) != null)
+                using (sr = new StreamReader(initLoc))
                 {
-                    ProcessCommand(lineraw);
+                    Log("Running script in init.hax...");
+                    script = true;
+                    string lineraw;
+                    while ((lineraw = sr.ReadLine()) != null)
+                    {
+                        if (!string.IsNullOrWhiteSpace(lineraw))
+                        {
+                            ProcessCommand(lineraw);
+                        }
+                    }
+                    sr.Close();
+                    script = false;
+                    Log("\n\n===================================================================================", showDateTime: false, trim: false);
+                    Log("Reached end of init.hax file. Entering CLI mode.");
+                    Log("===================================================================================\n\n", showDateTime: false, trim: false);
                 }
-                sr.Close();
-                script = false;
-                Log("\n\n===================================================================================", showDateTime: false, trim: false);
-                Log("Reached end of init.hax file. Entering CLI mode.");
-                Log("===================================================================================\n\n", showDateTime: false, trim: false);
             }
             while (true)
             {
                 Console.Write("\n\u001b[35m>\u001b[0m ");
                 string inputraw = Console.ReadLine();
-                ProcessCommand(inputraw);
+                if (!string.IsNullOrWhiteSpace(inputraw))
+                {
+                    ProcessCommand(inputraw);
+                }
 
             }
         }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Heloid.Commands.Chains
+namespace Heloid.Chains
 {
     public class MyChain : Chain
     {
@@ -12,6 +12,18 @@ namespace Heloid.Commands.Chains
         public override string Execute(string[] args, string prevcmdout)
         {
             //Do something
+            bool argsnull = true;
+            foreach (string arg in args)
+            {
+                if (!string.IsNullOrWhiteSpace(arg))
+                {
+                    argsnull = false;
+                }
+            }
+            if (args.Count() == 0 || argsnull)
+            {
+                //Def. do something!
+            }
             return "Something stupid happened. Command output:\n" + prevcmdout;
         }
 

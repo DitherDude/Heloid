@@ -1,82 +1,43 @@
-﻿using Heloid.Chains;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
-using System.Reflection;
-using System.Reflection.Metadata.Ecma335;
-using System.Security.Cryptography;
 using System.Text;
-using System.Text.RegularExpressions;
+using System.Threading.Channels;
 using System.Threading.Tasks;
+using Heloid.Chains;
 
-namespace Heloid.Commands
+namespace Heloid.Chains
 {
-    public class CommandManager
+    public class ChainManager
     {
-        static private ChainManager chainManager = new ChainManager();
-        public static List<Command> commands = new List<Command>
+        public static List<Chain> chains = new List<Chain>
         {
-            new HelpCommand(),
-            new ChainHelpCommand(),
-            new WorkingDir(),
-            new Shutdown(),
-            new Echo(),
-            new Con(),
-            new StringCmd(),
-            new BoolCmd(),
-            new Logic(),
+            new Length(),
+            new StringChn(),
+            new BoolChn(),
         };
 
-        public CommandManager()
+        public ChainManager()
         {
-            //commands = [];
+            //chains = [];
         }
-        public string ProcessInput(string rawinput)
-        {
-            string input = rawinput.Trim();
-            Regex regex = new Regex(@"(?<!%)%[^%]+%(?!%)");
-            MatchCollection matches = regex.Matches(input);
-            foreach (Match match in matches)
-            {
-                bool OK = false;
-                string arg1 = match.Value.Remove(0, 1);
-                arg1 = arg1.Remove(arg1.Length - 1, 1);
-                for (int i = 0; i < Env.table.Rows.Count; i++)
-                {
-                    if (Env.table.Rows[i][0].ToString() == arg1)
-                    {
-                        OK = true;
-                        input = input.Remove(match.Index, match.Value.Length).Insert(match.Index, Env.table.Rows[i][2].ToString());
-                    }
-                }
-                if (!OK)
-                {
-                    return $"Variable not found: {arg1}";
-                }
-            }
-            input = Regex.Replace(input, @"%%{1}", "%");
-            if (string.IsNullOrWhiteSpace(input))
-            {
-                return "\r";
-            }
-            if (Env.unsafecode == true)
-            {
-                Env.Log($"Received minor Command \"{input}\"... (unsafe)", logAll: true);
-            }
-            else
-            {
-                Env.Log($"Received minor Command \"{input}\"...", logAll: true);
-            }
-            string[] split = input.Split(' ');
-            string command = split[0].ToLower();
-            List<string> args = new List<string>();
 
+        public string ProcessInput(string chainraw, string inputraw)
+        {
+            string input = chainraw.Trim();
+            string[] split = input.Split(' ');
+            string chain = split[0].ToLower();
+            List<string> args = new List<string>();
             int count = 0;
             int procType = 0;
             string proc = "";
             foreach (string s in split)
             {
+                //if (count != 0)
+                //{
+                //    args.Add(s);
+                //}
+                //count++;
                 if (s == ">>")
                 {
                     procType = 1;
@@ -95,20 +56,9 @@ namespace Heloid.Commands
                 }
                 if (procType == 0)
                 {
-                    if (count != 0)
+                    if (count != 0 && !string.IsNullOrWhiteSpace(s))
                     {
-                        if (command != "echo")
-                        {
-                            if (!string.IsNullOrWhiteSpace(s))
-                            {
-                                args.Add(s);
-                            }
-                        }
-                        else
-                        {
-                            args.Add(s);
-                        }
-
+                        args.Add(s);
                     }
                     count++;
                 }
@@ -118,17 +68,17 @@ namespace Heloid.Commands
                 }
             }
             bool chained = false;
-            foreach (Command cmd in commands)
+            foreach (Chain chn in chains)
             {
-                if (cmd.Name == command)
+                if (chn.Name == chain)
                 {
                     if (procType == 0)
                     {
-                        return cmd.Execute(args.ToArray()) + "\n";
+                        return chn.Execute(args.ToArray(), inputraw) + "\n";
                     }
                     else
                     {
-                        string output = cmd.Execute(args.ToArray()).Trim();
+                        string output = chn.Execute(args.ToArray(), inputraw).Trim();
                         int part = 0;
                         bool done = false;
                         string[] cmds = proc.Split(" ");
@@ -199,7 +149,8 @@ namespace Heloid.Commands
                                     }
                                     temppart++;
                                 }
-                                output = chainManager.ProcessInput(bitstring, output);
+                                //output = Chains.Chains.Chain(bitstring, output);
+                                output = ProcessInput(bitstring, output);
                                 part = temppart;
                             }
                         }
@@ -207,15 +158,12 @@ namespace Heloid.Commands
                     }
                 }
             }
-            return $"\u001b[93mCommand \'\u001b[31m{command}\u001b[93m\' couldn't be found. Are you sure it exists?\u001b[0m\n\n";
-            //return Ext.BugReport();
-
-
+            return $"\u001b[93mChain Command \'\u001b[31m{chain}\u001b[93m\' couldn't be found. Are you sure it exists?\u001b[0m\n\n";
         }
 
-        public static bool CommandExists(string input)
+        public static bool ChainExists(string input)
         {
-            return commands.Any(command => command.Name.Equals(input, StringComparison.OrdinalIgnoreCase));
+            return chains.Any(chain => chain.Name.Equals(input, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

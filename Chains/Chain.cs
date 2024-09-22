@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Heloid.Commands.Chains
+namespace Heloid.Chains
 {
     public class Chain
     {

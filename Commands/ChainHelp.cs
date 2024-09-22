@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Heloid.Chains;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,15 +7,15 @@ using System.Threading.Tasks;
 
 namespace Heloid.Commands
 {
-    public class HelpCommand : Command
+    public class ChainHelpCommand : Command
     {
-        public HelpCommand(string name = "help") : base(name) { }
+        public ChainHelpCommand(string name = "chelp") : base(name) { }
         public override string Execute(string[] args)
         {
             if (args.Length == 0)
             {
                 string help = "";
-                foreach (Command c in CommandManager.commands.OrderBy(o => o.Name))
+                foreach (Chain c in ChainManager.chains.OrderBy(o => o.Name))
                 {
                     help += "\u001b[34m" + c.Name.ToUpper() + "\u001b[0m:\n";
                     help += c.Help() + "\n\n";
@@ -23,14 +24,14 @@ namespace Heloid.Commands
             }
             if (args.Length == 1)
             {
-                if (CommandManager.CommandExists(args[0].ToLower()))
+                if (ChainManager.ChainExists(args[0].ToLower()))
                 {
-                    Command c = CommandManager.commands.Find(command => command.Name.Equals(args[0], StringComparison.OrdinalIgnoreCase));
+                    Chain c = ChainManager.chains.Find(chain => chain.Name.Equals(args[0], StringComparison.OrdinalIgnoreCase));
                     return "\u001b[34m" + c.Name.ToUpper() + "\u001b[0m:\n" + c.Help() + "\n\n";
                 }
                 else
                 {
-                    return Ext.Error("Syntax Error", "That command doesn't exist.", Name);
+                    return Ext.Error("Syntax Error", "That chain doesn't exist.", Name);
                 }
             }
             return Ext.Error("Arg Overflow Error", "Too many arguments.", Name);
@@ -38,10 +39,10 @@ namespace Heloid.Commands
 
         public override string Help()
         {
-            string data = "   Provides help information for Heloid commands.\n";
-            data += "Usage: \u001b[32mHELP\u001b[33m [commandName]\u001b[0m\n";
-            data += "Examples: \"\u001b[32mHELP\u001b[0m\" - returns all help information.\n";
-            data += "Examples: \"\u001b[32mHELP\u001b[33m STRING\u001b[0m\" - returns help information regarding the STRING command.";
+            string data = "   Provides help information for Heloid chains.\n";
+            data += "Usage: \u001b[32mCHELP\u001b[33m [commandName]\u001b[0m\n";
+            data += "Examples: \"\u001b[32mCHELP\u001b[0m\" - returns all chain help information.\n";
+            data += "Examples: \"\u001b[32mCHELP\u001b[33m LENGTH\u001b[0m\" - returns help information regarding the LENGTH chain.";
             return data;
         }
     }

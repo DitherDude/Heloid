@@ -8,7 +8,7 @@ namespace Heloid.Commands
 {
     public class MyChain : Command
     {
-        public MyChain(string name = "mycommand") : base(name) { }
+        public MyChain(string name = "mychain") : base(name) { }
         public override string Execute(string[] args)
         {
             //Do something
