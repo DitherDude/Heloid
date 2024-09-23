@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Heloid.Chains
 {
-    public class MyChain : Chain
+    public class _MyChain : Chain
     {
-        public MyChain(string name = "mychain") : base(name) { }
+        public _MyChain(string name = "mychain") : base(name) { }
         public override string Execute(string[] args, string prevcmdout)
         {
             //Do something

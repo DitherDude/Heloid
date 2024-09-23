@@ -26,6 +26,12 @@ namespace Heloid.Commands
             new StringCmd(),
             new BoolCmd(),
             new Logic(),
+            new Math(),
+            new IntCmd(),
+            new DoubleCmd(),
+            new FloatCmd(),
+            new Exit(),
+            new Clear(),
         };
 
         public CommandManager()
@@ -35,25 +41,11 @@ namespace Heloid.Commands
         public string ProcessInput(string rawinput)
         {
             string input = rawinput.Trim();
-            Regex regex = new Regex(@"(?<!%)%[^%]+%(?!%)");
+            Regex regex = new Regex(@"(?<!%)%(?!\s)[^%\s]+%(?!%)");
             MatchCollection matches = regex.Matches(input);
-            foreach (Match match in matches)
+            while (Matcher(matches, ref input) != "OK")
             {
-                bool OK = false;
-                string arg1 = match.Value.Remove(0, 1);
-                arg1 = arg1.Remove(arg1.Length - 1, 1);
-                for (int i = 0; i < Env.table.Rows.Count; i++)
-                {
-                    if (Env.table.Rows[i][0].ToString() == arg1)
-                    {
-                        OK = true;
-                        input = input.Remove(match.Index, match.Value.Length).Insert(match.Index, Env.table.Rows[i][2].ToString());
-                    }
-                }
-                if (!OK)
-                {
-                    return $"Variable not found: {arg1}";
-                }
+                matches = regex.Matches(input);
             }
             input = Regex.Replace(input, @"%%{1}", "%");
             if (string.IsNullOrWhiteSpace(input))
@@ -97,7 +89,8 @@ namespace Heloid.Commands
                 {
                     if (count != 0)
                     {
-                        if (command != "echo")
+                        // command is already ToLower();
+                        if (command != "echo" && command != "con")
                         {
                             if (!string.IsNullOrWhiteSpace(s))
                             {
@@ -216,6 +209,33 @@ namespace Heloid.Commands
         public static bool CommandExists(string input)
         {
             return commands.Any(command => command.Name.Equals(input, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public static string Matcher(MatchCollection matches, ref string input)
+        {
+            foreach (Match match in matches)
+            {
+                bool OK = false;
+                string arg1 = match.Value.Remove(0, 1);
+                arg1 = arg1.Remove(arg1.Length - 1, 1);
+                if (!string.IsNullOrWhiteSpace(arg1))
+                {
+                    for (int i = 0; i < Env.table.Rows.Count; i++)
+                    {
+                        if (Env.table.Rows[i][0].ToString() == arg1)
+                        {
+                            OK = true;
+                            input = input.Remove(match.Index, match.Value.Length).Insert(match.Index, Env.table.Rows[i][2].ToString());
+                            return "Yes";
+                        }
+                    }
+                    if (!OK)
+                    {
+                        return $"Variable not found: {arg1}";
+                    }
+                }
+            }
+            return "OK";
         }
     }
 }

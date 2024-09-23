@@ -15,6 +15,9 @@ namespace Heloid.Chains
             new Length(),
             new StringChn(),
             new BoolChn(),
+            new IntChn(),
+            new DoubleChn(),
+            new FloatChn(),
         };
 
         public ChainManager()
