@@ -12,12 +12,12 @@ namespace Heloid.Chains
     {
         public static List<Chain> chains = new List<Chain>
         {
-            new Length(),
-            new StringChn(),
             new BoolChn(),
-            new IntChn(),
             new DoubleChn(),
             new FloatChn(),
+            new IntChn(),
+            new Length(),
+            new StringChn(),
         };
 
         public ChainManager()

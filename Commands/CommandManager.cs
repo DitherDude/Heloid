@@ -17,21 +17,21 @@ namespace Heloid.Commands
         static private ChainManager chainManager = new ChainManager();
         public static List<Command> commands = new List<Command>
         {
-            new HelpCommand(),
-            new ChainHelpCommand(),
-            new WorkingDir(),
-            new Shutdown(),
-            new Echo(),
-            new Con(),
-            new StringCmd(),
             new BoolCmd(),
+            new ChainHelpCommand(),
+            new Clear(),
+            new Con(),
+            new DoubleCmd(),
+            new Echo(),
+            new Exit(),
+            new FloatCmd(),
+            new HelpCommand(),
+            new IntCmd(),
             new Logic(),
             new Math(),
-            new IntCmd(),
-            new DoubleCmd(),
-            new FloatCmd(),
-            new Exit(),
-            new Clear(),
+            new Shutdown(),
+            new StringCmd(),
+            new WorkingDir()
         };
 
         public CommandManager()
