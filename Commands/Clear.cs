@@ -22,7 +22,7 @@ namespace Heloid.Commands
         public override string Help()
         {
             string data = "   Clears the console screen.\n";
-            data += "Usage: \u001b[32mCLEAR\\u001b[0m\n";
+            data += "Usage: \u001b[32mCLEAR\u001b[0m\n";
             data += "Examples: \"\u001b[32mCLEAR\u001b[0m\" - Clears the console screen.";
             return data;
         }
